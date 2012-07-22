@@ -2,12 +2,13 @@ system = require('system')
 page = require('webpage').create()
 
 if system.args.length < 3
-  console.log 'Usage: bellagio.coffee <username> <password> [date]'
+  console.log 'Usage: bellagio.coffee <username> <password> [date] [time]'
   phantom.exit 1
 
 username = system.args[1]
 password = system.args[2]
 targetDate = system.args[3]
+targetTime = system.args[4] ? 18
 
 testindex = 0
 loadInProgress = false
@@ -18,7 +19,16 @@ config =
   bbq :
     fac : 14
 
+script = {}
+
+sortBy = (key, a, b, r) ->
+  r = if r then 1 else -1
+  return -1*r if a[key] > b[key]
+  return 1*r if a[key] < b[key]
+  return 0
+
 page.viewportSize = width: 1240, height: 768
+page.settings.loadImages = false
 #page.settings.userAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_4) AppleWebKit/537.2 (KHTML, like Gecko) Chrome/22.0.1213.0 Safari/537.2'
 
 page.onConsoleMessage = (msg) -> console.log(msg)
@@ -55,27 +65,33 @@ steps=[
     page.open "http://113.28.45.75/Portal/"
   ,
   ()->
-    includes ()->
+    includes(()->
       page.evaluate((username, password)->
         $('#txtUserID').val username
         $('#txtPassword').val password
         $('#cmdLogin').click()
       , username, password)
+    loadInProgress = true
+    )
   ,
   ()->
     page.open "http://113.28.45.75/Portal/module.aspx?name=booking&file=book&selfac=#{config.badminton.fac}"
   ,
   ()->
-    includes ()->
-      page.evaluate((targetDate)->
+    includes(()->
+      script.freeslots = JSON.parse(page.evaluate((targetDate, targetTime)->
         times = ($(slot).text() for slot in $('table.content tr td:first-child'))
         dates = ($(date).text() for date in $('table.content tr:first-child td'))
+
+        distance = (time)->
+          start = parseInt(time.substring(0, 2), 10)
+          Math.abs(targetTime - start)
 
         freeslots = (for checkbox in $('table.content :checkbox')
           row = $(checkbox).closest('tr')[0].rowIndex
           id = $(checkbox).attr('id')
-          col = id.charAt(id.length-1)
-          col: col, row: row, id: id, date: dates[col], time: times[row]
+          col = parseInt(id.charAt(id.length-1), 10)+1
+          col: col, row: row, id: id, date: dates[col], time: times[row], distance: distance(times[row])
         )
 
         sortBy = (key, a, b, r) ->
@@ -88,15 +104,34 @@ steps=[
           sortBy('col', a, b) or
           sortBy('row', a, b)
 
-        freeslots.filter (s) -> s.date.indexOf(targetDate) > -1 unless targetDate?
+        freeslots = freeslots.filter (s) -> s.date.indexOf(targetDate) > -1 if targetDate?
 
         console.log $('#Module1__ctl4_lblBookPeriod').text()
         console.log "Available slots: #{freeslots.length}"
         console.log ("##{i} #{slot.date} #{slot.time}" for slot, i in freeslots).join '\n'
-      , targetDate)
+
+        JSON.stringify(freeslots)
+      , targetDate, targetTime))
+    )
   ,
   ()->
+    script.freeslots.sort (a,b) ->
+      sortBy('distance', a, b)
 
+    target = script.freeslots[0]
+    phantom.exit(1) unless target?
+    console.log "targeting #{target.date} #{target.time}"
+    page.evaluate((target)->
+      $("##{target}").attr('checked', true)
+      $('#Module1__ctl4_cmdConfirm').click()
+    , target.id)
+    loadInProgress = true
+  ,
+  ()->
+    includes(()->
+      page.evaluate ()->
+        console.log $('#Module1__ctl4_cmdAccept').val()
+    )
   ,
   ()->
     console.log 'end'
