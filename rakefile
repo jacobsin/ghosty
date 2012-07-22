@@ -1,0 +1,6 @@
+desc 'Run phantomjs'
+task :phantomjs, :script do |t, args|
+  phantomjs_root = 'phantomjs'
+  args.with_defaults(:script => "#{phantomjs_root}/examples/version.js")
+  puts sh "#{phantomjs_root}/bin/phantomjs #{args[:script]}"
+end
