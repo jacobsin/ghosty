@@ -3,4 +3,11 @@ task :phantomjs, :script do |t, args|
   phantomjs_root = 'phantomjs'
   args.with_defaults(:script => "#{phantomjs_root}/examples/version.js")
   puts sh "#{phantomjs_root}/bin/phantomjs #{args[:script]}"
+  end
+
+desc 'Run casperjs'
+task :casperjs, :script do |t, args|
+  casperjs_root = 'casperjs'
+  args.with_defaults(:script => "--version")
+  puts sh "#{casperjs_root}/bin/casperjs #{args[:script]}"
 end

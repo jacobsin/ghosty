@@ -33,7 +33,7 @@ page.settings.loadImages = false
 
 page.onConsoleMessage = (msg) -> console.log(msg)
 
-page.onLoadStarted = ()->
+page.onLoadStarted = ->
   loadInProgress = true
 #  console.log 'load started'
 
@@ -43,7 +43,7 @@ page.onLoadFinished = (status)->
     console.log 'FAIL to load the address'
     phantom.exit 1
   else
-    console.log page.evaluate(()->document.title)
+    console.log page.evaluate(->document.title)
 #    console.log 'load finished'
 
 page.onResourceRequested = (request)->
@@ -52,7 +52,7 @@ page.onResourceRequested = (request)->
 page.onResourceReceived = (response)->
 #  console.log "Receive #{response.id} #{response.url} #{response.status} #{response.stage}"
 
-page.onUrlChanged = () -> console.log(arguments[0])
+page.onUrlChanged = -> console.log(arguments[0])
 
 includes = (onIncluded)->
   loadInProgress = true
@@ -61,11 +61,11 @@ includes = (onIncluded)->
     onIncluded()
 
 steps=[
-  ()->
+  ->
     page.open "http://113.28.45.75/Portal/"
   ,
-  ()->
-    includes(()->
+  ->
+    includes(->
       page.evaluate((username, password)->
         $('#txtUserID').val username
         $('#txtPassword').val password
@@ -74,11 +74,11 @@ steps=[
     loadInProgress = true
     )
   ,
-  ()->
+  ->
     page.open "http://113.28.45.75/Portal/module.aspx?name=booking&file=book&selfac=#{config.badminton.fac}"
   ,
-  ()->
-    includes(()->
+  ->
+    includes(->
       script.freeslots = JSON.parse(page.evaluate((targetDate, targetTime)->
         times = ($(slot).text() for slot in $('table.content tr td:first-child'))
         dates = ($(date).text() for date in $('table.content tr:first-child td'))
@@ -114,7 +114,7 @@ steps=[
       , targetDate, targetTime))
     )
   ,
-  ()->
+  ->
     script.freeslots.sort (a,b) ->
       sortBy('distance', a, b)
 
@@ -127,17 +127,18 @@ steps=[
     , target.id)
     loadInProgress = true
   ,
-  ()->
+  ->
     includes(()->
       page.evaluate ()->
-        console.log $('#Module1__ctl4_cmdAccept').val()
+        document.getElementById('Module1__ctl4_cmdAccept').click()
     )
+    loadInProgress = true
   ,
-  ()->
+  ->
     console.log 'end'
 ]
 
-interval = setInterval(()->
+interval = setInterval(->
 #  console.log loadInProgress
   if (!loadInProgress && typeof steps[testindex] == "function")
     console.log "step #{(testindex + 1)}"
