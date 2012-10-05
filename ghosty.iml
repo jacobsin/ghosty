@@ -3,7 +3,7 @@
   <component name="NewModuleRootManager" inherit-compiler-output="true">
     <exclude-output />
     <content url="file://$MODULE_DIR$" />
-    <orderEntry type="jdk" jdkName="RVM: jruby-1.6.7.2" jdkType="JRUBY_SDK" />
+    <orderEntry type="jdk" jdkName="jruby-1.6.7.2-p357 (wallaby tools)" jdkType="JRUBY_SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>
