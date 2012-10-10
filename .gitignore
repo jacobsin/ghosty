@@ -1,5 +1,6 @@
 .idea/workspace.xml
 phantomjs/
 casperjs/
+capture/
 app/download/
 *.png

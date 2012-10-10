@@ -8,8 +8,8 @@ var capture = 1;
 var utils = require('utils'),
   casper = require('casper').create({
     clientScripts: [
-      'includes/jquery.min.js', // These two scripts will be injected in remote
-      'includes/underscore.min.js'   // DOM on every request
+      'lib/jquery.js', // These two scripts will be injected in remote
+      'lib/underscore.js'   // DOM on every request
     ],
 //    verbose: true,
     logLevel: 'info', // Only "info" level messages will be logged
@@ -25,7 +25,7 @@ var utils = require('utils'),
   });
 
 casper.on('step.complete', function () {
-  this.capture('images/' + capture++ + '.png');
+  this.capture('capture/' + capture++ + '.png');
 });
 
 casper.on('page.error', function (msg, trace) {

@@ -1,3 +1,6 @@
+var fs = require('fs'),
+    _ = require('underscore');
+
 var handle = function(req, options) {
   var capture = 1,
       downloaded = [],
@@ -6,13 +9,10 @@ var handle = function(req, options) {
 
   // casper setup
 
-  var utils = require('utils'),
-      fs = require('fs'),
-      _ = require('./includes/underscore.min'),
-      casper = require('casper').create({
+  var casper = require('casper').create({
         clientScripts: [
-          'includes/jquery.min.js',    // These two scripts will be injected in remote
-          'includes/underscore.min.js' // DOM on every req
+          'lib/jquery.js',    // These two scripts will be injected in remote
+          'lib/underscore.js' // DOM on every req
         ],
     //    verbose: true,
         logLevel: 'info',              // Only "info" level messages will be logged
@@ -29,7 +29,7 @@ var handle = function(req, options) {
       });
 
   casper.on('step.complete', function () {
-    this.capture('images/' + capture++ + '.png');
+    this.capture('capture/' + capture++ + '.png');
   });
 
   casper.on('page.error', function (msg, trace) {
@@ -42,7 +42,7 @@ var handle = function(req, options) {
 
   // casper steps
   casper.start('http://pastie.org/3244563', function () {
-    this.download('http://pastie.org/pastes/3244563/download'/*, 'app/download/3244563.txt'*/);
+    this.download('http://pastie.org/pastes/3244563/download', 'app/download/3244563.txt');
   });
 
   casper.then(function () {

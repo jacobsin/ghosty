@@ -143,7 +143,7 @@ interval = setInterval(->
   if (!loadInProgress && typeof steps[stepIndex] == "function")
     console.log "step #{(stepIndex + 1)}"
     steps[stepIndex]()
-    page.render("images/step#{(stepIndex + 1)}.png") if renderStep
+    page.render("capture/step#{(stepIndex + 1)}.png") if renderStep
     stepIndex++
   if (typeof steps[stepIndex] != "function")
     phantom.exit()

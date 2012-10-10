@@ -15,5 +15,5 @@ casper.then ->
 
 
 casper.run ->
-  @capture 'images/casper.png'
+  @capture 'capture/casper.png'
   @test.renderResults true

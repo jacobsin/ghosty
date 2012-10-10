@@ -11,8 +11,7 @@ phantom.onError = function (msg, trace) {
 
 // Example using HTTP POST operation
 
-var page = require('webpage').create(),
-  server = require('webserver').create(),
+var server = require('webserver').create(),
   system = require('system'),
   handler = require('./app/handler');
 
@@ -53,6 +52,6 @@ service = server.listen(port, function (req, res) {
       }
     });
   } catch (e) {
-    error(req, res, e.message ? e : {message: e});
+    error(req, res, e);
   }
 });
