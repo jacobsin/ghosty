@@ -47,7 +47,6 @@ casper.then(function () {
   this.test.assertEquals(['app/download/3244563.txt'], downloaded);
 });
 
-
 casper.run(function () {
   this.exit();
 });
