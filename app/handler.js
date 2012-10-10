@@ -1,6 +1,3 @@
-var fs = require('fs'),
-    _ = require('underscore');
-
 var handle = function(req, options) {
   var capture = 1,
       responded = false;

@@ -1,14 +1,6 @@
 var _ = require('underscore'),
-    fs = require('fs');
-
-require('super');
-
-var CasperSteps = Class.extend({
-  init: function (options) {
-    this.casper = options.casper;
-    this.req = options.req;
-  }
-});
+    fs = require('fs'),
+    CasperSteps = require('./app/casper/casper_steps');
 
 var DownloadSteps = CasperSteps.extend({
   init: function (options) {
