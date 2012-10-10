@@ -3,8 +3,6 @@ var fs = require('fs'),
 
 var handle = function(req, options) {
   var capture = 1,
-      downloaded = [],
-      content,
       responded = false;
 
   // casper setup
@@ -36,34 +34,15 @@ var handle = function(req, options) {
     this.echo("Warning: " + msg, "warning");
   });
 
-  casper.on('downloaded.file', function(targetPath) {
-    downloaded.push(targetPath);
-  });
-
   // casper steps
-  casper.start('http://pastie.org/3244563', function () {
-    this.download('http://pastie.org/pastes/3244563/download', 'app/download/3244563.txt');
-  });
-
-  casper.then(function () {
-    this.test.assertEquals(['app/download/3244563.txt'], downloaded, 'downloaded 1 file');
-  });
-
-  casper.then(function() {
-    var stream = fs.open('app/download/3244563.txt', 'r');
-    content = stream.read();
-    stream.close();
-  });
-
-  casper.then(function () {
-    this.test.assert(content.length > 0, 'download has non blank content');
-  });
+  var steps = require('./app/casper/download').create(casper, req);
+  steps.specify();
 
   casper.run(function() {
     if (responded) return;
     var failures = this.test.getFailures();
     if (failures.length == 0) {
-      var result = _.extend({}, req, {content: content});
+      var result = steps.result();
       options.success(result);
     } else {
       options.error({message:"one or more assertions failed", failures: failures});
